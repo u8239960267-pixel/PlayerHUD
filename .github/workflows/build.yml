@@ -14,14 +14,19 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Grant Execute Permission for Gradle
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Locate and Build Project
+        run: |
+          # Szuka folderu z plikiem build.gradle i tam uruchamia kompilację
+          GRADLE_DIR=$(find . -name "build.gradle" -exec dirname {} \;)
+          echo "Znaleziono projekt w: $GRADLE_DIR"
+          cd $GRADLE_DIR
+          gradle build --no-daemon
 
       - name: Upload Mod Jar
         uses: actions/upload-artifact@v4
         with:
           name: PlayerHUD-Jar
-          path: build/libs/*.jar
+          path: "**/build/libs/*.jar"
